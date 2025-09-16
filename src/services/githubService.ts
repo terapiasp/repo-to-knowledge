@@ -13,6 +13,13 @@ interface FileContent {
   size: number;
 }
 
+interface ProgressCallback {
+  onProgress: (progress: number) => void;
+  onCurrentFile: (fileName: string, filePath: string) => void;
+  onFileComplete: (fileName: string, filePath: string) => void;
+  onFileError: (fileName: string, filePath: string, error: string) => void;
+}
+
 export class GitHubService {
   private static extractRepoInfo(url: string): { owner: string; repo: string } | null {
     try {
@@ -45,7 +52,10 @@ export class GitHubService {
     throw new Error('Falha após múltiplas tentativas');
   }
 
-  static async getAllFiles(repoUrl: string): Promise<FileContent[]> {
+  static async getAllFiles(
+    repoUrl: string, 
+    callbacks?: ProgressCallback
+  ): Promise<FileContent[]> {
     const repoInfo = this.extractRepoInfo(repoUrl);
     if (!repoInfo) {
       throw new Error('URL inválida. Use o formato: https://github.com/usuario/repositorio');
@@ -77,12 +87,18 @@ export class GitHubService {
       const fileContents: FileContent[] = [];
       const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
       
-      for (const file of docFiles) {
+      for (let i = 0; i < docFiles.length; i++) {
+        const file = docFiles[i];
+        const fileName = file.path.split('/').pop() || file.path;
+        
         try {
+          // Update progress
+          const progress = (i / docFiles.length) * 100;
+          callbacks?.onProgress(progress);
+          callbacks?.onCurrentFile(fileName, file.path);
+          
           const contentResponse = await this.fetchWithRetry(rawBaseUrl + file.path);
           const content = await contentResponse.text();
-          
-          const fileName = file.path.split('/').pop() || file.path;
           
           fileContents.push({
             name: fileName,
@@ -90,11 +106,17 @@ export class GitHubService {
             content,
             size: file.size || content.length
           });
+          
+          callbacks?.onFileComplete(fileName, file.path);
         } catch (error) {
           console.warn(`Erro ao baixar ${file.path}:`, error);
+          callbacks?.onFileError(fileName, file.path, error instanceof Error ? error.message : 'Erro desconhecido');
         }
       }
 
+      // Final progress update
+      callbacks?.onProgress(100);
+      
       return fileContents.sort((a, b) => a.path.localeCompare(b.path));
     } catch (error) {
       if (error instanceof Error) {

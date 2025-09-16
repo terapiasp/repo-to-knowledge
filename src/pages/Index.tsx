@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GitHubInput } from "@/components/GitHubInput";
 import { FilesList } from "@/components/FilesList";
+import { ProgressViewer } from "@/components/ProgressViewer";
 import { GitHubService } from "@/services/githubService";
 import { useToast } from "@/hooks/use-toast";
 import { Book, Github } from "lucide-react";
@@ -12,12 +13,25 @@ interface FileItem {
   size?: number;
 }
 
+interface ProgressItem {
+  fileName: string;
+  filePath: string;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+}
+
 const Index = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [consolidating, setConsolidating] = useState(false);
   const [consolidated, setConsolidated] = useState(false);
   const [consolidatedContent, setConsolidatedContent] = useState("");
+  
+  // Progress states
+  const [progress, setProgress] = useState(0);
+  const [currentFile, setCurrentFile] = useState("");
+  const [progressFiles, setProgressFiles] = useState<ProgressItem[]>([]);
+  const [totalFiles, setTotalFiles] = useState(0);
+  
   const { toast } = useToast();
 
   const handleSubmit = async (url: string) => {
@@ -25,10 +39,59 @@ const Index = () => {
     setFiles([]);
     setConsolidated(false);
     setConsolidatedContent("");
+    setProgress(0);
+    setCurrentFile("");
+    setProgressFiles([]);
+    setTotalFiles(0);
 
     try {
-      const fetchedFiles = await GitHubService.getAllFiles(url);
+      const fetchedFiles = await GitHubService.getAllFiles(url, {
+        onProgress: (progressValue) => {
+          setProgress(progressValue);
+        },
+        onCurrentFile: (fileName, filePath) => {
+          setCurrentFile(filePath);
+          setProgressFiles(prev => {
+            const newFiles = [...prev];
+            const existingIndex = newFiles.findIndex(f => f.filePath === filePath);
+            
+            if (existingIndex >= 0) {
+              newFiles[existingIndex].status = 'processing';
+            } else {
+              newFiles.push({
+                fileName,
+                filePath,
+                status: 'processing'
+              });
+            }
+            
+            setTotalFiles(newFiles.length);
+            return newFiles;
+          });
+        },
+        onFileComplete: (fileName, filePath) => {
+          setProgressFiles(prev => 
+            prev.map(f => 
+              f.filePath === filePath 
+                ? { ...f, status: 'completed' as const }
+                : f
+            )
+          );
+        },
+        onFileError: (fileName, filePath, error) => {
+          setProgressFiles(prev => 
+            prev.map(f => 
+              f.filePath === filePath 
+                ? { ...f, status: 'error' as const }
+                : f
+            )
+          );
+        }
+      });
+      
       setFiles(fetchedFiles);
+      setCurrentFile("");
+      
       toast({
         title: "Sucesso!",
         description: `${fetchedFiles.length} arquivos encontrados`,
@@ -110,6 +173,15 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
         <GitHubInput onSubmit={handleSubmit} loading={loading} />
+        
+        {loading && (
+          <ProgressViewer 
+            progress={progress}
+            currentFile={currentFile}
+            files={progressFiles}
+            totalFiles={totalFiles}
+          />
+        )}
         
         <FilesList
           files={files}

@@ -45,53 +45,57 @@ export class GitHubService {
     throw new Error('Falha após múltiplas tentativas');
   }
 
-  static async getFiles(repoUrl: string, folderPath: string): Promise<FileContent[]> {
+  static async getAllFiles(repoUrl: string): Promise<FileContent[]> {
     const repoInfo = this.extractRepoInfo(repoUrl);
     if (!repoInfo) {
       throw new Error('URL inválida. Use o formato: https://github.com/usuario/repositorio');
     }
 
     const { owner, repo } = repoInfo;
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}`;
-
+    
     try {
-      const response = await this.fetchWithRetry(apiUrl);
-      const files: GitHubFile[] = await response.json();
+      // Get all files recursively using Git Trees API
+      const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`;
+      const response = await this.fetchWithRetry(treeUrl);
+      const data = await response.json();
 
-      if (!Array.isArray(files)) {
-        throw new Error('Pasta não encontrada ou não é um diretório');
+      if (!data.tree) {
+        throw new Error('Não foi possível acessar a árvore do repositório');
       }
 
       // Filter for documentation files
-      const docFiles = files.filter(file => 
-        file.type === 'file' && 
-        /\.(md|txt|rst|mdx|adoc)$/i.test(file.name)
+      const docFiles = data.tree.filter((item: any) => 
+        item.type === 'blob' && 
+        /\.(md|txt|rst|mdx|adoc|markdown)$/i.test(item.path)
       );
 
       if (docFiles.length === 0) {
-        throw new Error('Nenhum arquivo de documentação encontrado na pasta especificada');
+        throw new Error('Nenhum arquivo de documentação encontrado no repositório');
       }
 
       // Fetch content for each file
       const fileContents: FileContent[] = [];
+      const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
       
       for (const file of docFiles) {
         try {
-          const contentResponse = await this.fetchWithRetry(file.download_url);
+          const contentResponse = await this.fetchWithRetry(rawBaseUrl + file.path);
           const content = await contentResponse.text();
           
+          const fileName = file.path.split('/').pop() || file.path;
+          
           fileContents.push({
-            name: file.name,
+            name: fileName,
             path: file.path,
             content,
-            size: file.size
+            size: file.size || content.length
           });
         } catch (error) {
-          console.warn(`Erro ao baixar ${file.name}:`, error);
+          console.warn(`Erro ao baixar ${file.path}:`, error);
         }
       }
 
-      return fileContents.sort((a, b) => a.name.localeCompare(b.name));
+      return fileContents.sort((a, b) => a.path.localeCompare(b.path));
     } catch (error) {
       if (error instanceof Error) {
         throw error;

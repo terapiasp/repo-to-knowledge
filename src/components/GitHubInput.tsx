@@ -5,18 +5,17 @@ import { Card } from "@/components/ui/card";
 import { GitBranch, Folder, Search } from "lucide-react";
 
 interface GitHubInputProps {
-  onSubmit: (url: string, path: string) => void;
+  onSubmit: (url: string) => void;
   loading: boolean;
 }
 
 export function GitHubInput({ onSubmit, loading }: GitHubInputProps) {
   const [url, setUrl] = useState("");
-  const [path, setPath] = useState("docs");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (url.trim()) {
-      onSubmit(url.trim(), path.trim());
+      onSubmit(url.trim());
     }
   };
 
@@ -28,7 +27,7 @@ export function GitHubInput({ onSubmit, loading }: GitHubInputProps) {
         </div>
         <div>
           <h2 className="text-xl font-semibold text-foreground">GitHub Repository</h2>
-          <p className="text-sm text-muted-foreground">Consolidar documentação em arquivo único</p>
+          <p className="text-sm text-muted-foreground">Buscar todos os arquivos de documentação do repositório</p>
         </div>
       </div>
 
@@ -45,20 +44,9 @@ export function GitHubInput({ onSubmit, loading }: GitHubInputProps) {
             onChange={(e) => setUrl(e.target.value)}
             className="bg-secondary border-border focus:ring-primary"
           />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground flex items-center gap-2">
-            <Folder className="w-4 h-4" />
-            Pasta de Documentação
-          </label>
-          <Input
-            type="text"
-            placeholder="docs"
-            value={path}
-            onChange={(e) => setPath(e.target.value)}
-            className="bg-secondary border-border focus:ring-primary"
-          />
+          <p className="text-xs text-muted-foreground">
+            Todos os arquivos .md, .txt, .rst, .mdx, .adoc do repositório serão incluídos
+          </p>
         </div>
 
         <Button 

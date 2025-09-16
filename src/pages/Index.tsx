@@ -20,14 +20,14 @@ const Index = () => {
   const [consolidatedContent, setConsolidatedContent] = useState("");
   const { toast } = useToast();
 
-  const handleSubmit = async (url: string, path: string) => {
+  const handleSubmit = async (url: string) => {
     setLoading(true);
     setFiles([]);
     setConsolidated(false);
     setConsolidatedContent("");
 
     try {
-      const fetchedFiles = await GitHubService.getFiles(url, path);
+      const fetchedFiles = await GitHubService.getAllFiles(url);
       setFiles(fetchedFiles);
       toast({
         title: "Sucesso!",

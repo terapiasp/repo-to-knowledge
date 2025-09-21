@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { GitHubInput } from "@/components/GitHubInput";
+import { DocumentationTabs } from "@/components/DocumentationTabs";
 import { FilesList } from "@/components/FilesList";
 import { ProgressViewer } from "@/components/ProgressViewer";
-import { GitHubService } from "@/services/githubService";
+import { DocumentationService } from "@/services/DocumentationService";
 import { useToast } from "@/hooks/use-toast";
 import { Book, Github } from "lucide-react";
+import { DocumentationSource } from "@/types/documentation";
 
 interface FileItem {
   name: string;
@@ -25,6 +26,7 @@ const Index = () => {
   const [consolidating, setConsolidating] = useState(false);
   const [consolidated, setConsolidated] = useState(false);
   const [consolidatedContent, setConsolidatedContent] = useState("");
+  const [currentSource, setCurrentSource] = useState<DocumentationSource>("github");
   
   // Progress states
   const [progress, setProgress] = useState(0);
@@ -34,7 +36,8 @@ const Index = () => {
   
   const { toast } = useToast();
 
-  const handleSubmit = async (url: string) => {
+  const handleSubmit = async (source: DocumentationSource, url: string) => {
+    setCurrentSource(source);
     setLoading(true);
     setFiles([]);
     setConsolidated(false);
@@ -45,7 +48,7 @@ const Index = () => {
     setTotalFiles(0);
 
     try {
-      const fetchedFiles = await GitHubService.getAllFiles(url, {
+      const fetchedFiles = await DocumentationService.getAllFiles(source, url, {
         onProgress: (progressValue) => {
           setProgress(progressValue);
         },
@@ -118,7 +121,7 @@ const Index = () => {
         throw new Error("Nenhum arquivo válido para consolidar");
       }
       
-      const content = GitHubService.consolidateFiles(validFiles);
+      const content = DocumentationService.consolidateFiles(currentSource, validFiles);
       setConsolidatedContent(content);
       setConsolidated(true);
       
@@ -140,7 +143,7 @@ const Index = () => {
   const handleDownload = () => {
     if (consolidatedContent) {
       const filename = `documentacao-consolidada-${new Date().toISOString().split('T')[0]}.md`;
-      GitHubService.downloadFile(consolidatedContent, filename);
+      DocumentationService.downloadFile(consolidatedContent, filename);
       
       toast({
         title: "Download iniciado!",
@@ -163,7 +166,7 @@ const Index = () => {
                 Docs Consolidator
               </h1>
               <p className="text-muted-foreground">
-                Consolide documentação do GitHub em arquivo único para IA
+                Consolide documentação de GitHub e websites em arquivo único para IA
               </p>
             </div>
           </div>
@@ -172,7 +175,7 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
-        <GitHubInput onSubmit={handleSubmit} loading={loading} />
+        <DocumentationTabs onSubmit={handleSubmit} loading={loading} />
         
         {loading && (
           <ProgressViewer 
@@ -195,7 +198,7 @@ const Index = () => {
         <footer className="text-center text-sm text-muted-foreground pt-8 border-t border-border/50">
           <div className="flex items-center justify-center gap-2">
             <Github className="w-4 h-4" />
-            Ferramenta para consolidação de documentação GitHub
+            Ferramenta para consolidação de documentação GitHub e Websites
           </div>
         </footer>
       </main>

@@ -1,11 +1,9 @@
 import { DocumentationProvider, DocumentationSource, FileContent, ProgressCallback } from '@/types/documentation';
 import { GitHubProvider } from './providers/GitHubProvider';
-import { WebsiteProvider } from './providers/WebsiteProvider';
 
 export class DocumentationService {
   private static providers: Map<DocumentationSource, DocumentationProvider> = new Map([
-    ['github', new GitHubProvider()],
-    ['website', new WebsiteProvider()]
+    ['github', new GitHubProvider()]
   ]);
 
   static getProvider(source: DocumentationSource): DocumentationProvider {
@@ -37,9 +35,6 @@ export class DocumentationService {
   }
 
   static detectSource(url: string): DocumentationSource {
-    if (url.includes('github.com')) {
-      return 'github';
-    }
-    return 'website';
+    return 'github';
   }
 }

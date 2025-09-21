@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GitHubInput } from "./GitHubInput";
+import { WebsiteInput } from "./WebsiteInput";
 import { Github, Globe } from "lucide-react";
 import { DocumentationSource } from "@/types/documentation";
 
@@ -38,15 +39,7 @@ export function DocumentationTabs({ onSubmit, loading }: DocumentationTabsProps)
       </TabsContent>
       
       <TabsContent value="website">
-        <div className="p-6 bg-gradient-card shadow-card border-border rounded-lg">
-          <div className="text-center">
-            <Globe className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Website Documentation</h3>
-            <p className="text-muted-foreground mb-4">
-              Funcionalidade em desenvolvimento. Use a aba GitHub por enquanto.
-            </p>
-          </div>
-        </div>
+        <WebsiteInput onSubmit={handleWebsiteSubmit} loading={loading} />
       </TabsContent>
     </Tabs>
   );

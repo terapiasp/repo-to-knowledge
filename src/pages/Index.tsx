@@ -163,7 +163,7 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">
-                Docs Consolidator
+                repo to knowledge
               </h1>
               <p className="text-muted-foreground">
                 Consolide documentação de GitHub e websites em arquivo único para IA

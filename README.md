@@ -1,73 +1,147 @@
-# Welcome to your Lovable project
+# Docs Consolidator
 
-## Project info
+Uma aplicação moderna para consolidar documentação de repositórios GitHub e websites em um único arquivo markdown otimizado para IA.
 
-**URL**: https://lovable.dev/projects/d302ef21-51cd-4960-8701-f117c0dfe096
+## 🚀 Funcionalidades
 
-## How can I edit this code?
+- **Extração do GitHub**: Busca e processa todos os arquivos de um repositório
+- **Scraping de Websites**: Utiliza Firecrawl API para extrair conteúdo de sites
+- **Consolidação Inteligente**: Une todos os arquivos em um único markdown formatado
+- **Interface Moderna**: UI responsiva com design system completo
+- **Progress Tracking**: Acompanha o progresso da extração em tempo real
 
-There are several ways of editing your application.
+## 🛠 Tecnologias
 
-**Use Lovable**
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Routing**: React Router DOM
+- **HTTP Client**: Fetch API nativo
+- **Build Tool**: Vite
+- **Package Manager**: npm
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d302ef21-51cd-4960-8701-f117c0dfe096) and start prompting.
+## 📋 Pré-requisitos
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 18+ 
+- npm ou yarn
+- API Key do Firecrawl (para funcionalidade de websites)
 
-**Use your preferred IDE**
+## 🔧 Configuração do Desenvolvimento
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Clone o repositório
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd docs-consolidator
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 2. Instale as dependências
+```bash
+npm install
+```
 
-Follow these steps:
+### 3. Configure as APIs (opcional)
+```bash
+# Copie o arquivo de exemplo
+cp .env.example .env.local
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Adicione sua Firecrawl API key (opcional)
+# A aplicação funciona sem ela, mas você precisará inserir a key na interface
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 4. Inicie o servidor de desenvolvimento
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 5. Acesse a aplicação
+Abra [http://localhost:8080](http://localhost:8080) no seu navegador.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🔑 Configuração da API Firecrawl
 
-**Use GitHub Codespaces**
+1. Acesse [firecrawl.dev](https://firecrawl.dev) e crie uma conta
+2. Obtenha sua API key gratuita (500 créditos/mês)
+3. Na aplicação, clique na aba "Website" → "API Key"
+4. Cole sua chave e clique em "Salvar"
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🏗 Arquitetura do Projeto
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # Componentes React
+│   ├── ui/             # shadcn/ui components
+│   ├── DocumentationTabs.tsx
+│   ├── FilesList.tsx
+│   └── ...
+├── services/           # Lógica de negócio
+│   ├── providers/      # Provedores de dados
+│   └── DocumentationService.ts
+├── types/              # Definições TypeScript
+├── hooks/              # Custom hooks
+├── pages/              # Páginas da aplicação
+└── lib/                # Utilitários
+```
 
-This project is built with:
+## 🤝 Como Contribuir
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. **Fork** o projeto
+2. **Clone** seu fork: `git clone <sua-url>`
+3. **Crie** uma branch: `git checkout -b feature/nova-funcionalidade`
+4. **Commit** suas mudanças: `git commit -m 'feat: adiciona nova funcionalidade'`
+5. **Push** para a branch: `git push origin feature/nova-funcionalidade`
+6. **Abra** um Pull Request
 
-## How can I deploy this project?
+### Convenções de Commit
+- `feat:` nova funcionalidade
+- `fix:` correção de bug
+- `docs:` documentação
+- `style:` formatação, ponto e vírgula, etc
+- `refactor:` refatoração de código
+- `test:` adição de testes
 
-Simply open [Lovable](https://lovable.dev/projects/d302ef21-51cd-4960-8701-f117c0dfe096) and click on Share -> Publish.
+## 📚 Scripts Disponíveis
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build de produção
+npm run preview      # Preview do build
+npm run lint         # Linting com ESLint
+```
 
-Yes, you can!
+## 🔧 Desenvolvimento com Lovable
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Este projeto foi criado com [Lovable](https://lovable.dev) e suporta edição bidirecional:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **No Lovable**: Mudanças são automaticamente sincronizadas com o GitHub
+- **Localmente**: Commits são refletidos no Lovable automaticamente
+
+### Acesso ao Lovable
+**URL**: https://lovable.dev/projects/d302ef21-51cd-4960-8701-f117c0dfe096
+
+## 🚢 Deploy
+
+### Via Lovable (Recomendado)
+1. Acesse o projeto no Lovable
+2. Clique em "Share" → "Publish"
+3. Seu site estará disponível imediatamente
+
+### Deploy Manual
+O projeto é uma SPA padrão e pode ser deployado em qualquer provedor:
+- Vercel
+- Netlify  
+- GitHub Pages
+- Cloudflare Pages
+
+## 📖 Documentação Adicional
+
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia detalhado de contribuição
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Arquitetura técnica detalhada
+- [Lovable Docs](https://docs.lovable.dev/) - Documentação oficial do Lovable
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja [LICENSE](./LICENSE) para mais detalhes.
+
+## 🆘 Suporte
+
+- **Issues**: Use as GitHub Issues para reportar bugs ou sugerir features
+- **Discussões**: Use GitHub Discussions para perguntas gerais
+- **Lovable**: Acesse o projeto diretamente no Lovable para edições rápidas

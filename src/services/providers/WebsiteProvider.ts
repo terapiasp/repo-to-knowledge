@@ -92,7 +92,7 @@ export class WebsiteProvider implements DocumentationProvider {
 
       const crawlData: FirecrawlCrawlResponse = await crawlResponse.json();
       
-      if (!crawlData.success || !crawlData.jobId) {
+      if (!crawlData.jobId) {
         throw new Error(crawlData.error || 'Falha ao iniciar crawl do website');
       }
 

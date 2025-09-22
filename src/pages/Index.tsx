@@ -27,6 +27,7 @@ const Index = () => {
   const [consolidated, setConsolidated] = useState(false);
   const [consolidatedContent, setConsolidatedContent] = useState("");
   const [currentSource, setCurrentSource] = useState<DocumentationSource>("github");
+  const [currentUrl, setCurrentUrl] = useState("");
   
   // Progress states
   const [progress, setProgress] = useState(0);
@@ -38,6 +39,7 @@ const Index = () => {
 
   const handleSubmit = async (source: DocumentationSource, url: string) => {
     setCurrentSource(source);
+    setCurrentUrl(url);
     setLoading(true);
     setFiles([]);
     setConsolidated(false);
@@ -142,7 +144,7 @@ const Index = () => {
 
   const handleDownload = () => {
     if (consolidatedContent) {
-      const filename = `documentacao-consolidada-${new Date().toISOString().split('T')[0]}.md`;
+      const filename = DocumentationService.generateFileName(currentSource, currentUrl);
       DocumentationService.downloadFile(consolidatedContent, filename);
       
       toast({

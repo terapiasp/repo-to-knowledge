@@ -25,9 +25,19 @@ export class DocumentationService {
     return provider.getAllFiles(url, callbacks);
   }
 
-  static consolidateFiles(source: DocumentationSource, files: FileContent[]): string {
+  static consolidateFiles(source: DocumentationSource, files: FileContent[], url?: string): string {
     const provider = this.getProvider(source);
     return provider.consolidateFiles(files);
+  }
+
+  static generateFileName(source: DocumentationSource, url: string): string {
+    if (source === 'website') {
+      const provider = this.getProvider(source) as any;
+      return provider.generateFileName(url);
+    }
+    // For GitHub, keep existing logic
+    const today = new Date().toISOString().split('T')[0];
+    return `docs-consolidated-${today}.md`;
   }
 
   static downloadFile(content: string, filename: string): void {

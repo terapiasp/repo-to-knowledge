@@ -199,6 +199,22 @@ export class WebsiteProvider implements DocumentationProvider {
     return consolidated;
   }
 
+  generateFileName(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      let siteName = urlObj.hostname.replace('www.', '');
+      
+      // Remove common TLDs and clean up
+      siteName = siteName.split('.')[0];
+      
+      const today = new Date().toISOString().split('T')[0];
+      return `${siteName}-docs-${today}.md`;
+    } catch (error) {
+      const today = new Date().toISOString().split('T')[0];
+      return `website-docs-${today}.md`;
+    }
+  }
+
   downloadFile(content: string, filename: string): void {
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);

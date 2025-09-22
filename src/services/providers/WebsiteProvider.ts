@@ -77,7 +77,6 @@ export class WebsiteProvider implements DocumentationProvider {
           url: websiteUrl,
           crawlerOptions: {
             limit: 50,
-            excludes: ['*.jpg', '*.jpeg', '*.png', '*.gif', '*.pdf', '*.zip'],
           },
           pageOptions: {
             onlyMainContent: true,
